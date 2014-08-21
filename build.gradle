@@ -1,0 +1,17 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+
+sourceCompatibility = "1.6"
+targetCompatibility = "1.6"
+
+group = 'hu.webhejj.gradle'
+version = '1.0.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile gradleApi()
+    compile "org.apache.jena:jena-core:2.12.0"
+}
