@@ -9,25 +9,38 @@ Generates Java files from RDFS or OWL schema. See also the
 
 Example:
 
-    buildscript {
-        repositories {
-            mavenLocal()
-        }
-        dependencies {
-            classpath("hu.webhejj.gradle:gradle-jena-plugin:1.0.0-SNAPSHOT")
-        }
+```gradle
+buildscript {
+    repositories {
+        mavenCentral()
     }
+    dependencies {
+        classpath("hu.webhejj.gradle:gradle-jena-plugin:1.0.0")
+    }
+}
 
-    task ontgen(type: hu.webhejj.gradle.jena.SchemaGen) {
-        source = fileTree("src/main/resources/ontology")
-        outputDirectory = file("build/ontology")
-        packageName = "hu.webhejj.project.ontology"
-        classNameSuffix = "Ontology"
-        ontology = true
-        inference = true
-        nostrict = true
-    }
-    
+task schemagen(type: hu.webhejj.gradle.jena.SchemaGen) {
+    source = file("src/main/resources/ontology")
+    outputDirectory = file("build/ontology")
+    packageName = "hu.webhejj.project.ontology"
+    classNameSuffix = "Ontology"
+    ontology = true
+    inference = true
+    nostrict = true
+}
+```
+
+And then run as
+
+```sh
+gradle schemagen
+```
+
+
+## Downloads
+
+Available on [Maven Central](http://mvnrepository.com/artifact/hu.webhejj.gradle/gradle-jena-plugin/).
+
     
 ## License    
     
