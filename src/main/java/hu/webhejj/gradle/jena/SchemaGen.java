@@ -32,6 +32,8 @@ public class SchemaGen extends SourceTask {
     private boolean inference;
     private boolean ontology;
     private boolean nostrict;
+    private boolean nocomments = false;
+    private String namespace;
 
     @OutputDirectory
     public File getOutputDirectory() {
@@ -100,6 +102,30 @@ public class SchemaGen extends SourceTask {
         setNostrict(nostrict);
     }
 
+    @Input
+    @Optional
+    public boolean isNocomments() {
+        return nocomments;
+    }
+    public void setNocomments(boolean nocomments) {
+        this.nocomments = nocomments;
+    }
+    public void nocomments(boolean nocomments) {
+        setNocomments(nocomments);
+    }
+
+    @Input
+    @Optional
+    public String getNamespace() {
+        return namespace;
+    }
+    public void setNamespace(String namespace) {
+        this.namespace = namespace;
+    }
+    public void namespace(String namespace) {
+        setNamespace(namespace);
+    }
+
     @TaskAction
     public void exec() {
 
@@ -128,6 +154,13 @@ public class SchemaGen extends SourceTask {
             }
             if(isNostrict()) {
                 options.add("--nostrict");
+            }
+            if(isNocomments()) {
+                options.add("--nocomments");
+            }
+            if(getNamespace()!=null){
+                options.add("-a");
+                options.add(getNamespace());
             }
 
             logger.info("Excecuting schemagen: " + options);
