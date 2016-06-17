@@ -9,23 +9,22 @@
 package hu.webhejj.gradle.jena;
 
 import jena.schemagen;
+import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
-import org.gradle.api.tasks.Input;
-import org.gradle.api.tasks.Optional;
-import org.gradle.api.tasks.OutputDirectory;
-import org.gradle.api.tasks.SourceTask;
-import org.gradle.api.tasks.TaskAction;
+import org.gradle.api.tasks.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SchemaGen extends SourceTask {
+public class UrlSchemaGen extends DefaultTask {
 
-    private static final Logger logger = LoggerFactory.getLogger(SchemaGen.class);
+    private static final Logger logger = LoggerFactory.getLogger(UrlSchemaGen.class);
 
+    private URI input;
     private File outputDirectory;
     private String packageName;
     private String classNameSuffix;
@@ -35,13 +34,28 @@ public class SchemaGen extends SourceTask {
     private boolean nocomments = false;
     private String namespace;
 
+    @Input
+    public URI getInput() {
+        return input;
+    }
+
+    public void setInput(URI input) {
+        this.input = input;
+    }
+
+    public void input(URI input) {
+        setInput(input);
+    }
+
     @OutputDirectory
     public File getOutputDirectory() {
         return outputDirectory;
     }
+
     public void setOutputDirectory(File outputDirectory) {
         this.outputDirectory = outputDirectory;
     }
+
     public void outputDirectory(File outputDirectory) {
         setOutputDirectory(outputDirectory);
     }
@@ -50,9 +64,11 @@ public class SchemaGen extends SourceTask {
     public String getPackageName() {
         return packageName;
     }
+
     public void setPackageName(String packageName) {
         this.packageName = packageName;
     }
+
     public void packageName(String packageName) {
         setPackageName(packageName);
     }
@@ -62,9 +78,11 @@ public class SchemaGen extends SourceTask {
     public String getClassNameSuffix() {
         return classNameSuffix;
     }
+
     public void setClassNameSuffix(String classNameSuffix) {
         this.classNameSuffix = classNameSuffix;
     }
+
     public void classNameSuffix(String classNameSuffix) {
         setClassNameSuffix(classNameSuffix);
     }
@@ -73,9 +91,11 @@ public class SchemaGen extends SourceTask {
     public boolean isInference() {
         return inference;
     }
+
     public void setInference(boolean inference) {
         this.inference = inference;
     }
+
     public void inference(boolean inference) {
         setInference(inference);
     }
@@ -84,9 +104,11 @@ public class SchemaGen extends SourceTask {
     public boolean isOntology() {
         return ontology;
     }
+
     public void setOntology(boolean ontology) {
         this.ontology = ontology;
     }
+
     public void ontology(boolean ontology) {
         setOntology(ontology);
     }
@@ -95,9 +117,11 @@ public class SchemaGen extends SourceTask {
     public boolean isNostrict() {
         return nostrict;
     }
+
     public void setNostrict(boolean nostrict) {
         this.nostrict = nostrict;
     }
+
     public void nostrict(boolean nostrict) {
         setNostrict(nostrict);
     }
@@ -107,9 +131,11 @@ public class SchemaGen extends SourceTask {
     public boolean isNocomments() {
         return nocomments;
     }
+
     public void setNocomments(boolean nocomments) {
         this.nocomments = nocomments;
     }
+
     public void nocomments(boolean nocomments) {
         setNocomments(nocomments);
     }
@@ -119,63 +145,64 @@ public class SchemaGen extends SourceTask {
     public String getNamespace() {
         return namespace;
     }
+
     public void setNamespace(String namespace) {
         this.namespace = namespace;
     }
+
     public void namespace(String namespace) {
         setNamespace(namespace);
     }
 
+
     @TaskAction
     public void exec() {
-
         List<String> options = new ArrayList<String>();
-        for(File inputFile: getSource()) {
-            options.clear();
+        options.clear();
 
-            options.add("-i");
-            options.add(inputFile.getAbsolutePath());
+        options.add("-i");
+        options.add(getInput().toString());
 
-            options.add("-o");
-            options.add(getOutputDirectory().getAbsolutePath());
+        options.add("-o");
+        options.add(getOutputDirectory().getAbsolutePath());
 
-            options.add("--package");
-            options.add(getPackageName());
+        options.add("--package");
+        options.add(getPackageName());
 
-            if(getClassNameSuffix() != null) {
-                options.add("--classnamesuffix");
-                options.add(getClassNameSuffix());
-            }
-            if(isInference()) {
-                options.add("--inference");
-            }
-            if(isOntology()) {
-                options.add("--ontology");
-            }
-            if(isNostrict()) {
-                options.add("--nostrict");
-            }
-            if(isNocomments()) {
-                options.add("--nocomments");
-            }
-            if(getNamespace()!=null){
-                options.add("-a");
-                options.add(getNamespace());
-            }
+        if (getClassNameSuffix() != null) {
+            options.add("--classnamesuffix");
+            options.add(getClassNameSuffix());
+        }
+        if (isInference()) {
+            options.add("--inference");
+        }
+        if (isOntology()) {
+            options.add("--ontology");
+        }
+        if (isNostrict()) {
+            options.add("--nostrict");
+        }
+        if (isNocomments()) {
+            options.add("--nocomments");
+        }
+        if (getNamespace() != null) {
+            options.add("-a");
+            options.add(getNamespace());
+        }
 
-            logger.info("Excecuting schemagen: " + options);
 
-            // only go() will throw exception but it's protected
-            try {
-                new schemagen() {
-                    @Override
-                    protected void go(SchemagenOptions options) {
-                        super.go(options);
-                    }
-                }.go(new schemagen.SchemagenOptionsImpl(options.toArray(new String[options.size()])));
-            } catch (schemagen.SchemagenException e) {
-                throw new GradleException("Error while generating schema", e);
-            }
+        logger.info("Excecuting schemagen: " + options);
+
+        // only go() will throw exception but it's protected
+        try {
+            new schemagen() {
+                @Override
+                protected void go(SchemagenOptions options) {
+                    super.go(options);
+                }
+            }.go(new schemagen.SchemagenOptionsImpl(options.toArray(new String[options.size()])));
+        } catch (schemagen.SchemagenException e) {
+            throw new GradleException("Error while generating schema", e);
         }
     }
 }
